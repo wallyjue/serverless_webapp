@@ -1,0 +1,14 @@
+# Cloudflare Pages 配置檔案
+name = "po-shipment-frontend"
+compatibility_date = "2024-01-01"
+
+[env.production]
+compatibility_date = "2024-01-01"
+
+[env.preview]
+compatibility_date = "2024-01-01"
+
+# Pages 專案設定將在 Cloudflare Dashboard 中配置
+# 建置命令: npm run build
+# 建置輸出目錄: dist
+# 根目錄: /frontend

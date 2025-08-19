@@ -1,0 +1,7 @@
+# Cloudflare Pages 重導向規則
+
+# SPA 路由支援 - 所有路由都導向 index.html
+/*    /index.html   200
+
+# API 請求不重導向（保持原始路徑）
+/api/*  /api/:splat  200

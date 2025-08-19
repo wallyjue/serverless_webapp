@@ -1,0 +1,35 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:pages": "node build-for-pages.js",
+    "preview": "vite preview",
+    "preview:pages": "wrangler pages dev dist",
+    "deploy:pages": "wrangler pages deploy dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@aws-amplify/ui-react": "^6.11.2",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.1",
+    "@mui/material": "^7.3.1",
+    "aws-amplify": "^6.15.5",
+    "axios": "^1.11.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.8.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.1",
+    "vite": "^7.1.3"
+  }
+}
