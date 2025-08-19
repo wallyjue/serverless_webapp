@@ -66,6 +66,27 @@ npm run deploy:pages
 git push origin main
 ```
 
+## 疑難排解
+
+### 建置問題
+如果遇到建置錯誤，請參考：[BUILD_TROUBLESHOOTING.md](BUILD_TROUBLESHOOTING.md)
+
+### 常用指令
+```bash
+# 標準建置（適用於大多數情況）
+npm run build:pages
+
+# 簡化建置（如果遇到 ES6 語法錯誤）
+npm run build:pages:simple
+
+# 本地預覽 Cloudflare Pages
+npm run preview:pages
+
+# 清理並重新安裝依賴
+rm -rf node_modules package-lock.json
+npm install
+```
+
 ## 環境變數
 
 建立 `.env.local` 檔案：

@@ -244,5 +244,17 @@ sam deploy --resolve-s3
 ## 授權
 MIT License
 
+## 版本控制
+
+### .gitignore 配置
+專案包含完整的 .gitignore 配置：
+- **主要 .gitignore**: 涵蓋整個專案的忽略規則
+- **前端 .gitignore**: React + Vite + Cloudflare Pages 專用
+- **後端 .gitignore**: Python + AWS SAM 專用
+
+⚠️ **重要**: 請確保不要提交敏感資訊如 `.env` 檔案、AWS 憑證等。
+
+詳細說明請參考：[.gitignore 指南](docs/gitignore-guide.md)
+
 ## 技術支援
 如有問題請查看 `docs/` 目錄下的文檔或建立 Issue。

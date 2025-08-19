@@ -5,13 +5,11 @@
  * 處理環境變數並建置專案
  */
 
-import { execSync } from 'child_process';
-import { copyFileSync, existsSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+const { execSync } = require('child_process');
+const { copyFileSync, existsSync } = require('fs');
+const { join } = require('path');
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+// 在 CommonJS 中，__dirname 是全域變數，不需要額外定義
 
 console.log('🚀 開始建置 Cloudflare Pages 版本...');
 
