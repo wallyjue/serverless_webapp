@@ -1,0 +1,433 @@
+# =============================================================================
+# Purchase Order & Shipment Management System - .gitignore
+# =============================================================================
+
+# =============================================================================
+# 作業系統相關檔案
+# =============================================================================
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# =============================================================================
+# 編輯器和 IDE
+# =============================================================================
+
+# Visual Studio Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# JetBrains IDEs
+.idea/
+*.swp
+*.swo
+
+# Sublime Text
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# =============================================================================
+# Node.js / Frontend 相關
+# =============================================================================
+
+# 依賴套件
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# 建置輸出
+dist/
+dist-ssr/
+build/
+out/
+
+# 快取檔案
+.npm
+.eslintcache
+.parcel-cache/
+.cache/
+.temp/
+.tmp/
+
+# 環境變數檔案
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.staging
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# TypeScript
+*.tsbuildinfo
+
+# Storybook
+.storybook/
+storybook-static/
+
+# Coverage 報告
+coverage/
+*.lcov
+.nyc_output
+
+# =============================================================================
+# Python / Backend 相關
+# =============================================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff
+instance/
+.webassets-cache
+
+# Scrapy stuff
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# pdm
+.pdm.toml
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# PyCharm
+.idea/
+
+# =============================================================================
+# AWS SAM 相關
+# =============================================================================
+
+# SAM 建置輸出
+.aws-sam/
+samconfig.toml.bak
+
+# AWS CLI 配置（敏感資訊）
+.aws/
+
+# CloudFormation 打包檔案
+packaged.yaml
+packaged-template.yaml
+
+# =============================================================================
+# Cloudflare 相關
+# =============================================================================
+
+# Wrangler
+.wrangler/
+wrangler.toml.bak
+
+# Cloudflare 快取
+.cloudflare/
+
+# =============================================================================
+# Docker 相關
+# =============================================================================
+
+# Docker Compose 覆寫檔案
+docker-compose.override.yml
+docker-compose.override.yaml
+
+# =============================================================================
+# LocalStack 相關
+# =============================================================================
+
+# LocalStack 資料
+.localstack/
+volume/
+
+# =============================================================================
+# 記錄檔案
+# =============================================================================
+
+*.log
+logs/
+log/
+
+# =============================================================================
+# 暫存檔案
+# =============================================================================
+
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# =============================================================================
+# 壓縮檔案
+# =============================================================================
+
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# =============================================================================
+# 敏感資訊和設定檔案
+# =============================================================================
+
+# API 金鑰和密碼
+.secrets
+secrets.json
+.credentials
+
+# 本地配置檔案
+config.local.json
+settings.local.json
+
+# 測試資料
+test-data/
+*.test.json
+
+# =============================================================================
+# 專案特定忽略
+# =============================================================================
+
+# 建置產物
+frontend/dist/
+backend/.aws-sam/
+
+# 本地環境設定
+.env.local
+.env.development
+.env.test
+
+# 備份檔案
+*.bak
+*.backup
+*.old
+
+# 文檔建置
+docs/_build/
+docs/build/
+
+# 測試報告
+test-results/
+test-reports/
+
+# 效能分析
+profiling/
+*.prof
+
+# =============================================================================
+# 開發工具
+# =============================================================================
+
+# ESLint
+.eslintcache
+
+# Prettier
+.prettierignore
+
+# Husky
+.husky/_/
+
+# =============================================================================
+# 版本控制
+# =============================================================================
+
+# Git 合併衝突標記
+*.orig
+
+# Patch 檔案
+*.patch
+*.diff
+
+# =============================================================================
+# 其他
+# =============================================================================
+
+# 臨時檔案夾
+tmp/
+temp/
+
+# 鎖定檔案
+*.lock
+!package-lock.json
+
+# 執行檔案
+*.exe
+*.app
+
+# 符號連結
+*.lnk
