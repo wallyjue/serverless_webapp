@@ -1,0 +1,273 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Purchase Order & Shipment Management System
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: python3.13
+    Environment:
+      Variables:
+        USERS_TABLE: !Ref UsersTable
+        PURCHASE_ORDERS_TABLE: !Ref PurchaseOrdersTable
+        SHIPMENTS_TABLE: !Ref ShipmentsTable
+        COGNITO_USER_POOL_ID: !Ref CognitoUserPool
+        COGNITO_USER_POOL_CLIENT_ID: !Ref CognitoUserPoolClient
+
+Resources:
+  # Cognito User Pool
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: po-shipment-users
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireUppercase: true
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: false
+      Schema:
+        - Name: email
+          AttributeDataType: String
+          Required: true
+          Mutable: true
+        - Name: role
+          AttributeDataType: String
+          Mutable: true
+      AutoVerifiedAttributes:
+        - email
+
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref CognitoUserPool
+      ClientName: po-shipment-client
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ADMIN_NO_SRP_AUTH
+        - USER_PASSWORD_AUTH
+
+  # DynamoDB Tables
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Users
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: user_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: user_id
+          KeyType: HASH
+
+  PurchaseOrdersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: PurchaseOrders
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: po_id
+          AttributeType: S
+        - AttributeName: created_at
+          AttributeType: S
+      KeySchema:
+        - AttributeName: po_id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: created-at-index
+          KeySchema:
+            - AttributeName: created_at
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+
+  ShipmentsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Shipments
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: shipment_id
+          AttributeType: S
+        - AttributeName: po_id
+          AttributeType: S
+        - AttributeName: created_at
+          AttributeType: S
+      KeySchema:
+        - AttributeName: shipment_id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: po-id-index
+          KeySchema:
+            - AttributeName: po_id
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+        - IndexName: created-at-index
+          KeySchema:
+            - AttributeName: created_at
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+
+  # Lambda Functions
+  AuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: auth.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
+        - Statement:
+          - Effect: Allow
+            Action:
+              - cognito-idp:AdminCreateUser
+              - cognito-idp:AdminSetUserPassword
+              - cognito-idp:AdminUpdateUserAttributes
+              - cognito-idp:AdminDeleteUser
+              - cognito-idp:ListUsers
+            Resource: !GetAtt CognitoUserPool.Arn
+      Events:
+        LoginApi:
+          Type: Api
+          Properties:
+            Path: /auth/login
+            Method: post
+        LogoutApi:
+          Type: Api
+          Properties:
+            Path: /auth/logout
+            Method: post
+        RegisterApi:
+          Type: Api
+          Properties:
+            Path: /auth/register
+            Method: post
+
+  UserManagementFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: user_management.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
+        - Statement:
+          - Effect: Allow
+            Action:
+              - cognito-idp:AdminCreateUser
+              - cognito-idp:AdminSetUserPassword
+              - cognito-idp:AdminUpdateUserAttributes
+              - cognito-idp:AdminDeleteUser
+              - cognito-idp:ListUsers
+            Resource: !GetAtt CognitoUserPool.Arn
+      Events:
+        GetUsersApi:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: get
+        CreateUserApi:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: post
+        UpdateUserApi:
+          Type: Api
+          Properties:
+            Path: /users/{user_id}
+            Method: put
+        DeleteUserApi:
+          Type: Api
+          Properties:
+            Path: /users/{user_id}
+            Method: delete
+
+  PurchaseOrderFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: purchase_orders.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PurchaseOrdersTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref UsersTable
+      Events:
+        GetPurchaseOrdersApi:
+          Type: Api
+          Properties:
+            Path: /purchase-orders
+            Method: get
+        CreatePurchaseOrderApi:
+          Type: Api
+          Properties:
+            Path: /purchase-orders
+            Method: post
+        GetPurchaseOrderApi:
+          Type: Api
+          Properties:
+            Path: /purchase-orders/{po_id}
+            Method: get
+        UpdatePurchaseOrderApi:
+          Type: Api
+          Properties:
+            Path: /purchase-orders/{po_id}
+            Method: put
+        DeletePurchaseOrderApi:
+          Type: Api
+          Properties:
+            Path: /purchase-orders/{po_id}
+            Method: delete
+
+  ShipmentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: shipments.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ShipmentsTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref PurchaseOrdersTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref UsersTable
+      Events:
+        GetShipmentsApi:
+          Type: Api
+          Properties:
+            Path: /shipments
+            Method: get
+        CreateShipmentApi:
+          Type: Api
+          Properties:
+            Path: /shipments
+            Method: post
+        GetShipmentApi:
+          Type: Api
+          Properties:
+            Path: /shipments/{shipment_id}
+            Method: get
+        UpdateShipmentApi:
+          Type: Api
+          Properties:
+            Path: /shipments/{shipment_id}
+            Method: put
+        DeleteShipmentApi:
+          Type: Api
+          Properties:
+            Path: /shipments/{shipment_id}
+            Method: delete
+
+Outputs:
+  ApiGatewayEndpoint:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  CognitoUserPoolId:
+    Description: "Cognito User Pool ID"
+    Value: !Ref CognitoUserPool
+  CognitoUserPoolClientId:
+    Description: "Cognito User Pool Client ID"
+    Value: !Ref CognitoUserPoolClient
