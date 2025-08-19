@@ -181,8 +181,24 @@ sam deploy
 #### 前端部署到 Cloudflare Pages
 ```bash
 cd frontend/
+
+# 一般環境
 npm run build:pages
+
+# 新的 Linux 環境（推薦）
+npm run build:production
+
+# 部署
 npm run deploy:pages
+```
+
+#### Linux 環境自動化部署
+```bash
+# 執行完整的 Linux 環境部署腳本
+./scripts/deploy-linux.sh
+
+# 清理模式（重新安裝所有依賴）
+./scripts/deploy-linux.sh --clean
 ```
 
 ### LocalStack 本地部署

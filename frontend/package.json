@@ -8,6 +8,7 @@
     "build": "vite build",
     "build:pages": "node build-for-pages.js",
     "build:pages:simple": "node build-simple.js",
+    "build:production": "node build-production.js",
     "preview": "vite preview",
     "preview:pages": "wrangler pages dev dist",
     "deploy:pages": "wrangler pages deploy dist",

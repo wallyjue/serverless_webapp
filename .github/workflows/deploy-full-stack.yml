@@ -1,0 +1,120 @@
+name: Deploy Full Stack Application
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      deploy_backend:
+        description: 'Deploy backend to AWS'
+        required: false
+        default: 'true'
+        type: boolean
+      deploy_frontend:
+        description: 'Deploy frontend to Cloudflare Pages'
+        required: false
+        default: 'true'
+        type: boolean
+
+jobs:
+  deploy-backend:
+    if: github.event.inputs.deploy_backend != 'false'
+    runs-on: ubuntu-latest
+    name: Deploy Backend to AWS
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Setup AWS SAM CLI
+        uses: aws-actions/setup-sam@v2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Build SAM application
+        working-directory: ./backend
+        run: sam build
+
+      - name: Deploy SAM application
+        working-directory: ./backend
+        run: |
+          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name po-shipment-management --resolve-s3 --capabilities CAPABILITY_IAM --region us-east-1
+
+      - name: Get API Gateway URL
+        id: get-api-url
+        working-directory: ./backend
+        run: |
+          API_URL=$(aws cloudformation describe-stacks --stack-name po-shipment-management --query 'Stacks[0].Outputs[?OutputKey==`ApiGatewayEndpoint`].OutputValue' --output text)
+          echo "api_url=$API_URL" >> $GITHUB_OUTPUT
+          echo "API Gateway URL: $API_URL"
+
+    outputs:
+      api_url: ${{ steps.get-api-url.outputs.api_url }}
+
+  deploy-frontend:
+    if: github.event.inputs.deploy_frontend != 'false'
+    needs: deploy-backend
+    runs-on: ubuntu-latest
+    name: Deploy Frontend to Cloudflare Pages
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Create production environment file
+        working-directory: ./frontend
+        run: |
+          API_URL="${{ needs.deploy-backend.outputs.api_url || secrets.VITE_API_BASE_URL }}"
+          echo "VITE_API_BASE_URL=$API_URL" > .env.production
+          echo "VITE_DEPLOY_TARGET=cloudflare-pages" >> .env.production
+          echo "Using API URL: $API_URL"
+
+      - name: Build application for production
+        working-directory: ./frontend
+        run: npm run build:production
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: po-shipment-frontend
+          directory: frontend/dist
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+  notify:
+    needs: [deploy-backend, deploy-frontend]
+    if: always()
+    runs-on: ubuntu-latest
+    name: Notify Deployment Status
+    
+    steps:
+      - name: Deployment Summary
+        run: |
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|---------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Backend (AWS) | ${{ needs.deploy-backend.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Frontend (Cloudflare Pages) | ${{ needs.deploy-frontend.result }} |" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.deploy-backend.outputs.api_url }}" != "" ]; then
+            echo "| API URL | ${{ needs.deploy-backend.outputs.api_url }} |" >> $GITHUB_STEP_SUMMARY
+          fi

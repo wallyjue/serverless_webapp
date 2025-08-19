@@ -47,7 +47,27 @@ manualChunks: {
 }
 ```
 
-### 4. 找不到 `_headers` 或 `_redirects` 檔案
+### 4. `vite: not found` 錯誤
+
+**錯誤原因**: Vite 未正確安裝或不在 PATH 中。
+
+**解決方案**:
+```bash
+# 方法 1: 使用 npx 運行本地安裝的 vite
+npx vite build
+
+# 方法 2: 檢查 vite 是否安裝
+ls -la node_modules/.bin/vite
+
+# 方法 3: 重新安裝依賴
+rm -rf node_modules package-lock.json
+npm install
+
+# 方法 4: 使用生產環境建置腳本（推薦）
+npm run build:production
+```
+
+### 5. 找不到 `_headers` 或 `_redirects` 檔案
 
 **錯誤原因**: Cloudflare Pages 特定檔案不存在。
 
@@ -120,6 +140,49 @@ VITE_API_BASE_URL=http://localhost:3001
 # .env.production
 VITE_API_BASE_URL=https://your-api-id.execute-api.us-east-1.amazonaws.com/Prod
 VITE_DEPLOY_TARGET=production
+```
+
+## Linux/CI 環境特定問題
+
+### Node.js 版本問題
+```bash
+# 檢查 Node.js 版本
+node --version  # 應該 >= 18
+
+# Ubuntu/Debian 安裝 Node.js 18
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# CentOS/RHEL 安裝 Node.js 18
+curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
+sudo yum install -y nodejs
+```
+
+### 權限問題
+```bash
+# 如果遇到權限錯誤
+sudo chown -R $(whoami) ~/.npm
+sudo chown -R $(whoami) node_modules
+
+# 或使用 npm 配置避免 sudo
+npm config set prefix ~/.local
+export PATH=~/.local/bin:$PATH
+```
+
+### 記憶體不足
+```bash
+# 增加 Node.js 記憶體限制
+NODE_OPTIONS="--max-old-space-size=4096" npm run build:production
+
+# 檢查可用記憶體
+free -h
+```
+
+### CI/CD 環境建置
+```bash
+# 在 CI 環境中使用
+npm ci                          # 快速安裝
+npm run build:production        # 包含所有檢查的建置
 ```
 
 ## 建置輸出檢查
